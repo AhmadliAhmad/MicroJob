@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}Micro Job{% endblock %}</title>
@@ -26,6 +26,9 @@
         <a href="{{ url_for('login') }}">Login</a>
         <a href="{{ url_for('register') }}">Sign Up</a>
       {% endif %}
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <span id="theme-icon">🌙</span>
+      </button>
     </nav>
   </header>
 
@@ -46,5 +49,43 @@
   <footer class="footer">
     <span>Micro Job – Learn &amp; Earn • Hackathon demo</span>
   </footer>
+
+  <script>
+    (function() {
+      const themeToggle = document.getElementById('theme-toggle');
+      const themeIcon = document.getElementById('theme-icon');
+      const html = document.documentElement;
+      
+      const getTheme = () => {
+        const saved = localStorage.getItem('theme');
+        return saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      };
+      
+      const setTheme = (theme) => {
+        html.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        themeIcon.textContent = theme === 'dark' ? '🌙' : '☀️';
+      };
+      
+      const initTheme = () => {
+        const currentTheme = getTheme();
+        setTheme(currentTheme);
+      };
+      
+      themeToggle.addEventListener('click', () => {
+        const currentTheme = html.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+      });
+      
+      initTheme();
+      
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+          setTheme(e.matches ? 'dark' : 'light');
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
