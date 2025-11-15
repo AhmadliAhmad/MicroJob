@@ -274,11 +274,16 @@ def index():
     tasks = q.order_by(Task.id.desc()).all()
     user = current_user()
     
-    categories = db.session.query(Task.category).distinct().all()
-    categories = [c[0] for c in categories if c[0]]
+    # Fixed list of categories matching the job posting form
+    all_categories = [
+        'IT & Programming', 'Graphic & Design', 'Writing & Translation',
+        'Marketing & SMM', 'Education & Tutoring', 'Virtual Assistant', 'Data / AI Tasks',
+        'Delivery', 'Home & Repair Services', 'Event & Photography',
+        'Construction & Labor', 'Agriculture', 'Transportation'
+    ]
     
     return render_template('index.html', tasks=tasks, user=user, filter_mode=filter_mode,
-                         search=search, category=category, categories=categories, 
+                         search=search, category=category, categories=all_categories, 
                          min_budget=min_budget, max_budget=max_budget, difficulty=difficulty)
 
 
@@ -345,10 +350,29 @@ def new_task():
         title = request.form['title']
         description = request.form['description']
         budget = float(request.form['budget'])
-        category = request.form.get('category', '')
+        category = request.form.get('category', '').strip()
         mode = request.form.get('mode', 'online')
         required_skill = request.form.get('required_skill', '')
         difficulty = request.form.get('difficulty', 'beginner')
+
+        if not category:
+            flash('Please select a category.', 'error')
+            return render_template('new_task.html', user=user)
+
+        # Auto-set mode based on category if not explicitly set
+        online_categories = [
+            'IT & Programming', 'Graphic & Design', 'Writing & Translation',
+            'Marketing & SMM', 'Education & Tutoring', 'Virtual Assistant', 'Data / AI Tasks'
+        ]
+        offline_categories = [
+            'Delivery', 'Home & Repair Services', 'Event & Photography',
+            'Construction & Labor', 'Agriculture', 'Transportation'
+        ]
+        
+        if category in online_categories:
+            mode = 'online'
+        elif category in offline_categories:
+            mode = 'offline'
 
         task = Task(
             title=title,
@@ -469,6 +493,246 @@ def learn(task_id):
     learning_path = ai_learning_path(task)
     user = current_user()
     return render_template('learn.html', task=task, learning_path=learning_path, user=user)
+
+
+@app.route('/courses')
+def courses():
+    user = current_user()
+    
+    all_courses = [
+        # IT & Programming
+        {
+            'id': 1,
+            'title': 'Meta Front-End Developer Professional Certificate',
+            'description': 'Build job-ready skills in front-end development. Learn HTML, CSS, JavaScript, React, and UI/UX design principles.',
+            'category': 'IT & Programming',
+            'duration': '7 months',
+            'level': 'Beginner',
+            'topics': ['HTML/CSS', 'JavaScript', 'React', 'UI/UX Design'],
+            'provider': 'Meta (Coursera)',
+            'certification': True,
+            'url': 'https://www.coursera.org/professional-certificates/meta-front-end-developer'
+        },
+        {
+            'id': 2,
+            'title': 'Google IT Support Professional Certificate',
+            'description': 'Job-ready IT support training. Learn troubleshooting, networking, system administration, and security. No degree required.',
+            'category': 'IT & Programming',
+            'duration': '6 months',
+            'level': 'Beginner',
+            'topics': ['Troubleshooting', 'Networking', 'Operating Systems', 'Security'],
+            'provider': 'Google (Coursera)',
+            'certification': True,
+            'url': 'https://www.coursera.org/professional-certificates/google-it-support'
+        },
+        {
+            'id': 3,
+            'title': 'AWS Certified Cloud Practitioner',
+            'description': 'Amazon Web Services cloud fundamentals. Learn cloud concepts, AWS services, security, and architecture. Industry-leading certification.',
+            'category': 'IT & Programming',
+            'duration': '2-3 months',
+            'level': 'Beginner',
+            'topics': ['Cloud Concepts', 'AWS Services', 'Security', 'Architecture'],
+            'provider': 'Amazon Web Services',
+            'certification': True,
+            'url': 'https://aws.amazon.com/training/learn-about/cloud-practitioner/'
+        },
+        
+        # Graphic & Design
+        {
+            'id': 4,
+            'title': 'Google UX Design Professional Certificate',
+            'description': 'Learn user experience design from Google. Master design thinking, prototyping, user research, and portfolio building.',
+            'category': 'Graphic & Design',
+            'duration': '6 months',
+            'level': 'Beginner',
+            'topics': ['Design Thinking', 'Prototyping', 'User Research', 'Figma'],
+            'provider': 'Google (Coursera)',
+            'certification': True,
+            'url': 'https://www.coursera.org/professional-certificates/google-ux-design'
+        },
+        {
+            'id': 5,
+            'title': 'Adobe Certified Professional in Graphic Design',
+            'description': 'Master Adobe Creative Suite for graphic design. Learn Photoshop, Illustrator, and InDesign. Industry-recognized certification.',
+            'category': 'Graphic & Design',
+            'duration': '3-4 months',
+            'level': 'Intermediate',
+            'topics': ['Photoshop', 'Illustrator', 'InDesign', 'Design Principles'],
+            'provider': 'Adobe',
+            'certification': True,
+            'url': 'https://www.adobe.com/education/certification.html'
+        },
+        
+        # Writing & Translation
+        {
+            'id': 6,
+            'title': 'LinkedIn Learning: Professional Writing',
+            'description': 'Improve your professional writing skills. Learn business writing, email etiquette, and document creation. Certificate of completion.',
+            'category': 'Writing & Translation',
+            'duration': '8-10 hours',
+            'level': 'Beginner',
+            'topics': ['Business Writing', 'Email Communication', 'Documentation', 'Grammar & Style'],
+            'provider': 'LinkedIn Learning',
+            'certification': True,
+            'url': 'https://www.linkedin.com/learning/paths/improve-your-writing-skills'
+        },
+        {
+            'id': 7,
+            'title': 'Content Marketing Certification',
+            'description': 'HubSpot\'s comprehensive content marketing course. Learn content strategy, SEO, blogging, and content promotion. Free certification.',
+            'category': 'Writing & Translation',
+            'duration': '5-6 hours',
+            'level': 'Intermediate',
+            'topics': ['Content Strategy', 'SEO Writing', 'Blogging', 'Content Promotion'],
+            'provider': 'HubSpot Academy',
+            'certification': True,
+            'url': 'https://academy.hubspot.com/courses/content-marketing'
+        },
+        
+        # Marketing & SMM
+        {
+            'id': 8,
+            'title': 'Meta Social Media Marketing Professional Certificate',
+            'description': 'Job-ready certification program from Meta. Learn to create engaging content, run ad campaigns, and analyze performance metrics. Industry-recognized certificate.',
+            'category': 'Marketing & SMM',
+            'duration': '6 months',
+            'level': 'Beginner',
+            'topics': ['Facebook & Instagram Marketing', 'Content Strategy', 'Ad Campaigns', 'Analytics & Insights'],
+            'provider': 'Meta (Coursera)',
+            'certification': True,
+            'url': 'https://www.coursera.org/professional-certificates/meta-social-media-marketing'
+        },
+        {
+            'id': 9,
+            'title': 'Google Digital Marketing & E-commerce Certificate',
+            'description': 'Professional certificate from Google. Master digital marketing fundamentals, e-commerce strategies, and analytics. No experience required.',
+            'category': 'Marketing & SMM',
+            'duration': '6 months',
+            'level': 'Beginner',
+            'topics': ['SEO & SEM', 'Email Marketing', 'E-commerce', 'Google Analytics'],
+            'provider': 'Google (Coursera)',
+            'certification': True,
+            'url': 'https://www.coursera.org/professional-certificates/google-digital-marketing-ecommerce'
+        },
+        {
+            'id': 10,
+            'title': 'Inbound Marketing Certification',
+            'description': 'Master inbound marketing methodology. Learn to attract, engage, and delight customers. Industry-recognized free certification.',
+            'category': 'Marketing & SMM',
+            'duration': '4-5 hours',
+            'level': 'Beginner',
+            'topics': ['Inbound Methodology', 'Content Creation', 'Lead Generation', 'Marketing Automation'],
+            'provider': 'HubSpot Academy',
+            'certification': True,
+            'url': 'https://academy.hubspot.com/courses/inbound-marketing'
+        },
+        {
+            'id': 11,
+            'title': 'Google Analytics Individual Qualification (GAIQ)',
+            'description': 'Learn Google Analytics from the ground up. Master data collection, analysis, and reporting. Earn Google certification.',
+            'category': 'Marketing & SMM',
+            'duration': '4-6 hours',
+            'level': 'Intermediate',
+            'topics': ['Data Collection', 'Analysis', 'Reporting', 'E-commerce Tracking'],
+            'provider': 'Google Analytics Academy',
+            'certification': True,
+            'url': 'https://analytics.google.com/analytics/academy/'
+        },
+        
+        # Education & Tutoring
+        {
+            'id': 12,
+            'title': 'Teaching English as a Foreign Language (TEFL)',
+            'description': 'Learn how to teach English effectively to non-native speakers. Includes lesson planning, classroom management, and assessment strategies.',
+            'category': 'Education & Tutoring',
+            'duration': '120 hours',
+            'level': 'Beginner',
+            'topics': ['Teaching Methods', 'Lesson Planning', 'Classroom Management', 'Student Assessment'],
+            'provider': 'International TEFL Academy',
+            'certification': True,
+            'url': 'https://www.internationalteflacademy.com/'
+        },
+        {
+            'id': 13,
+            'title': 'Online Tutoring Best Practices',
+            'description': 'Master the art of online tutoring. Learn platform tools, engagement strategies, and effective communication techniques.',
+            'category': 'Education & Tutoring',
+            'duration': '20 hours',
+            'level': 'Beginner',
+            'topics': ['Online Platforms', 'Student Engagement', 'Communication', 'Technology Tools'],
+            'provider': 'Coursera',
+            'certification': True,
+            'url': 'https://www.coursera.org/learn/online-tutoring'
+        },
+        
+        # Virtual Assistant
+        {
+            'id': 14,
+            'title': 'Microsoft Excel Skills for Business Specialization',
+            'description': 'Master Excel for business analytics. Learn advanced formulas, pivot tables, data analysis, and automation. Earn a specialization certificate.',
+            'category': 'Virtual Assistant',
+            'duration': '4 months',
+            'level': 'Beginner',
+            'topics': ['Excel Formulas', 'Pivot Tables', 'Data Analysis', 'Automation'],
+            'provider': 'Macquarie University (Coursera)',
+            'certification': True,
+            'url': 'https://www.coursera.org/specializations/excel'
+        },
+        {
+            'id': 15,
+            'title': 'Virtual Assistant Training Program',
+            'description': 'Comprehensive training for virtual assistants. Learn email management, calendar scheduling, data entry, and client communication.',
+            'category': 'Virtual Assistant',
+            'duration': '6 weeks',
+            'level': 'Beginner',
+            'topics': ['Email Management', 'Calendar Scheduling', 'Data Entry', 'Client Communication'],
+            'provider': 'Udemy',
+            'certification': True,
+            'url': 'https://www.udemy.com/courses/search/?q=virtual+assistant'
+        },
+        
+        # Data / AI Tasks
+        {
+            'id': 16,
+            'title': 'IBM Data Science Professional Certificate',
+            'description': 'Comprehensive data science program covering Python, SQL, machine learning, and data visualization. Includes hands-on projects.',
+            'category': 'Data / AI Tasks',
+            'duration': '3-6 months',
+            'level': 'Beginner',
+            'topics': ['Python Programming', 'SQL', 'Machine Learning', 'Data Visualization'],
+            'provider': 'IBM (Coursera)',
+            'certification': True,
+            'url': 'https://www.coursera.org/professional-certificates/ibm-data-science'
+        },
+        {
+            'id': 17,
+            'title': 'Introduction to Artificial Intelligence',
+            'description': 'Learn the fundamentals of AI and machine learning. Understand algorithms, neural networks, and practical applications.',
+            'category': 'Data / AI Tasks',
+            'duration': '2-3 months',
+            'level': 'Intermediate',
+            'topics': ['AI Fundamentals', 'Machine Learning', 'Neural Networks', 'Practical Applications'],
+            'provider': 'Stanford (Coursera)',
+            'certification': True,
+            'url': 'https://www.coursera.org/learn/machine-learning'
+        },
+        
+    ]
+    
+    category_filter = request.args.get('category', 'all')
+    level_filter = request.args.get('level', 'all')
+    
+    filtered_courses = all_courses
+    if category_filter != 'all':
+        filtered_courses = [c for c in filtered_courses if c['category'].lower() == category_filter.lower()]
+    if level_filter != 'all':
+        filtered_courses = [c for c in filtered_courses if c['level'].lower() == level_filter.lower()]
+    
+    categories = sorted(set(c['category'] for c in all_courses))
+    
+    return render_template('courses.html', courses=filtered_courses, user=user, 
+                         category_filter=category_filter, level_filter=level_filter, categories=categories)
 
 
 @app.route('/profile/<int:user_id>')
@@ -682,40 +946,278 @@ def init_db():
     db.session.add(worker)
     db.session.commit()
 
-    t1 = Task(
-        title='Create 3 Instagram posts for local café',
-        description='We need 3 simple posts (photo + text) for Instagram in Azerbaijani.',
-        budget_azn=15,
-        category='Social media',
+    # Online Jobs
+    tasks = [
+        # IT & Programming
+        Task(
+            title='Fix WordPress website bug',
+            description='Need to fix a responsive design issue on our WordPress site. The mobile menu is not working properly.',
+            budget_azn=50,
+            category='IT & Programming',
         mode='online',
-        required_skill='social media, canva, design',
+            required_skill='WordPress, CSS, HTML, PHP',
+            difficulty='intermediate',
+            employer_id=employer.id
+        ),
+        Task(
+            title='Build simple landing page',
+            description='Create a one-page landing page for our new product launch. Need modern design with contact form.',
+            budget_azn=80,
+            category='IT & Programming',
+            mode='online',
+            required_skill='HTML, CSS, JavaScript',
         difficulty='beginner',
         employer_id=employer.id
-    )
-    t2 = Task(
-        title='Translate 2 pages EN → AZ',
-        description='Simple text, not technical. Around 600–800 words.',
-        budget_azn=20,
-        category='Translation',
+        ),
+        
+        # Graphic & Design
+        Task(
+            title='Design logo for startup company',
+            description='Need a professional logo design for our tech startup. Should be modern and memorable.',
+            budget_azn=120,
+            category='Graphic & Design',
         mode='online',
-        required_skill='translation, english, azerbaijani',
+            required_skill='Logo design, Adobe Illustrator, branding',
         difficulty='intermediate',
         employer_id=employer.id
-    )
-    t3 = Task(
-        title='Help at offline event (2 hours)',
-        description='Assist with registration and photos at a youth event in Baku.',
-        budget_azn=25,
-        category='Event support',
+        ),
+        Task(
+            title='Create 5 social media graphics',
+            description='Need 5 Instagram post designs for our café. Should match our brand colors and style.',
+            budget_azn=40,
+            category='Graphic & Design',
+            mode='online',
+            required_skill='Canva, Photoshop, social media design',
+            difficulty='beginner',
+            employer_id=employer.id
+        ),
+        
+        # Writing & Translation
+        Task(
+            title='Translate website content (EN → AZ)',
+            description='Translate our company website from English to Azerbaijani. About 10 pages of content.',
+            budget_azn=150,
+            category='Writing & Translation',
+            mode='online',
+            required_skill='Translation, English, Azerbaijani, SEO',
+            difficulty='intermediate',
+            employer_id=employer.id
+        ),
+        Task(
+            title='Write 3 blog posts about technology',
+            description='Need 3 engaging blog posts about latest tech trends. Each post should be 800-1000 words.',
+            budget_azn=90,
+            category='Writing & Translation',
+            mode='online',
+            required_skill='Content writing, SEO, technology knowledge',
+            difficulty='intermediate',
+            employer_id=employer.id
+        ),
+        
+        # Marketing & SMM
+        Task(
+            title='Manage Instagram account for 1 month',
+            description='Need someone to create content, post daily, and engage with followers for our fashion brand.',
+            budget_azn=200,
+            category='Marketing & SMM',
+            mode='online',
+            required_skill='Social media management, Instagram, content creation',
+            difficulty='intermediate',
+            employer_id=employer.id
+        ),
+        Task(
+            title='Create Facebook ad campaign',
+            description='Design and set up a Facebook advertising campaign for our local restaurant. Need creative ads.',
+            budget_azn=100,
+            category='Marketing & SMM',
+            mode='online',
+            required_skill='Facebook Ads, marketing, graphic design',
+            difficulty='intermediate',
+            employer_id=employer.id
+        ),
+        
+        # Education & Tutoring
+        Task(
+            title='Online English tutoring for kids',
+            description='Need an English tutor for my 8-year-old child. 2 hours per week, online sessions.',
+            budget_azn=60,
+            category='Education & Tutoring',
+            mode='online',
+            required_skill='English teaching, kids education, online tutoring',
+            difficulty='beginner',
+            employer_id=employer.id
+        ),
+        Task(
+            title='Math tutoring for high school student',
+            description='Need help with algebra and geometry. Online sessions, flexible schedule.',
+            budget_azn=80,
+            category='Education & Tutoring',
+            mode='online',
+            required_skill='Mathematics, teaching, high school curriculum',
+            difficulty='intermediate',
+            employer_id=employer.id
+        ),
+        
+        # Virtual Assistant
+        Task(
+            title='Data entry and email management',
+            description='Need help organizing customer data in Excel and managing daily emails. 10 hours per week.',
+            budget_azn=150,
+            category='Virtual Assistant',
+            mode='online',
+            required_skill='Excel, email management, data entry',
+            difficulty='beginner',
+            employer_id=employer.id
+        ),
+        Task(
+            title='Schedule appointments and manage calendar',
+            description='Help manage my business calendar, schedule meetings, and send reminders to clients.',
+            budget_azn=120,
+            category='Virtual Assistant',
+            mode='online',
+            required_skill='Calendar management, communication, organization',
+            difficulty='beginner',
+            employer_id=employer.id
+        ),
+        
+        # Data / AI Tasks
+        Task(
+            title='Data analysis for sales report',
+            description='Analyze our monthly sales data and create visualizations. Need insights and recommendations.',
+            budget_azn=180,
+            category='Data / AI Tasks',
+            mode='online',
+            required_skill='Excel, data analysis, visualization, statistics',
+            difficulty='advanced',
+            employer_id=employer.id
+        ),
+        Task(
+            title='Organize customer database',
+            description='Clean and organize our customer database. Remove duplicates and update contact information.',
+            budget_azn=70,
+            category='Data / AI Tasks',
+            mode='online',
+            required_skill='Data entry, Excel, database management',
+            difficulty='beginner',
+            employer_id=employer.id
+        ),
+        
+        # Offline Jobs - Delivery
+        Task(
+            title='Food delivery in Baku city center',
+            description='Need reliable person for food delivery service. Must have own transportation. Flexible hours.',
+            budget_azn=200,
+            category='Delivery',
         mode='offline',
-        required_skill='communication',
+            required_skill='Delivery, driving, customer service',
         difficulty='beginner',
         employer_id=employer.id
-    )
+        ),
+        
+        # Home & Repair Services
+        Task(
+            title='Fix leaking faucet in kitchen',
+            description='Kitchen faucet is leaking. Need someone to repair or replace it. Must bring own tools.',
+            budget_azn=40,
+            category='Home & Repair Services',
+            mode='offline',
+            required_skill='Plumbing, home repair',
+            difficulty='intermediate',
+            employer_id=employer.id
+        ),
+        Task(
+            title='Paint living room walls',
+            description='Need to paint 2 walls in living room. Room is 25 square meters. Paint provided.',
+            budget_azn=80,
+            category='Home & Repair Services',
+            mode='offline',
+            required_skill='Painting, home improvement',
+            difficulty='beginner',
+            employer_id=employer.id
+        ),
+        
+        # Event & Photography
+        Task(
+            title='Photographer for wedding event',
+            description='Need professional photographer for wedding ceremony. 6 hours coverage, 200+ photos.',
+            budget_azn=500,
+            category='Event & Photography',
+            mode='offline',
+            required_skill='Photography, wedding photography, photo editing',
+            difficulty='advanced',
+            employer_id=employer.id
+        ),
+        Task(
+            title='Event assistant for corporate meeting',
+            description='Help with setup, registration, and coordination at corporate event. 4 hours.',
+            budget_azn=60,
+            category='Event & Photography',
+            mode='offline',
+            required_skill='Event management, communication, organization',
+            difficulty='beginner',
+            employer_id=employer.id
+        ),
+        
+        # Construction & Labor
+        Task(
+            title='Help with furniture assembly',
+            description='Need help assembling IKEA furniture. 3 pieces: bed, wardrobe, and desk.',
+            budget_azn=50,
+            category='Construction & Labor',
+            mode='offline',
+            required_skill='Furniture assembly, tools',
+            difficulty='beginner',
+            employer_id=employer.id
+        ),
+        Task(
+            title='Garden cleanup and landscaping',
+            description='Clean up garden, trim bushes, and plant new flowers. Garden is 100 square meters.',
+            budget_azn=120,
+            category='Construction & Labor',
+            mode='offline',
+            required_skill='Gardening, landscaping, physical work',
+            difficulty='beginner',
+            employer_id=employer.id
+        ),
+        
+        # Agriculture
+        Task(
+            title='Harvest vegetables from garden',
+            description='Need help harvesting tomatoes, cucumbers, and peppers. 4 hours work.',
+            budget_azn=40,
+            category='Agriculture',
+            mode='offline',
+            required_skill='Farming, physical work',
+            difficulty='beginner',
+            employer_id=employer.id
+        ),
+        
+        # Transportation
+        Task(
+            title='Drive to airport and back',
+            description='Need driver to pick up from airport and drop off at hotel. 2 trips, same day.',
+            budget_azn=60,
+            category='Transportation',
+            mode='offline',
+            required_skill='Driving, valid license, reliable car',
+            difficulty='beginner',
+            employer_id=employer.id
+        ),
+        Task(
+            title='Moving help - furniture transport',
+            description='Need help moving furniture from old apartment to new one. Need truck and 2 helpers.',
+            budget_azn=150,
+            category='Transportation',
+            mode='offline',
+            required_skill='Moving, transportation, physical work',
+            difficulty='intermediate',
+            employer_id=employer.id
+        ),
+    ]
 
-    db.session.add_all([t1, t2, t3])
+    db.session.add_all(tasks)
     db.session.commit()
-    print("Database initialized with demo data.")
+    print(f"Database initialized with demo data: {len(tasks)} jobs created.")
 
 
 if __name__ == '__main__':

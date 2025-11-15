@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Courses – Learn New Skills{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Job-Oriented Training & Certifications</h1>
+  <p class="subtitle">Professional courses and certifications from leading companies to advance your career</p>
+</div>
+
+<div class="courses-filters">
+  <form method="GET" action="{{ url_for('courses') }}" class="filter-form">
+    <div class="filter-group">
+      <label>Category:</label>
+      <select name="category" onchange="this.form.submit()" class="filter-select">
+        <option value="all" {% if category_filter == 'all' %}selected{% endif %}>All Categories</option>
+        <option value="IT & Programming" {% if category_filter == 'IT & Programming' %}selected{% endif %}>IT & Programming</option>
+        <option value="Graphic & Design" {% if category_filter == 'Graphic & Design' %}selected{% endif %}>Graphic & Design</option>
+        <option value="Writing & Translation" {% if category_filter == 'Writing & Translation' %}selected{% endif %}>Writing & Translation</option>
+        <option value="Marketing & SMM" {% if category_filter == 'Marketing & SMM' %}selected{% endif %}>Marketing & SMM</option>
+        <option value="Education & Tutoring" {% if category_filter == 'Education & Tutoring' %}selected{% endif %}>Education & Tutoring</option>
+        <option value="Virtual Assistant" {% if category_filter == 'Virtual Assistant' %}selected{% endif %}>Virtual Assistant</option>
+        <option value="Data / AI Tasks" {% if category_filter == 'Data / AI Tasks' %}selected{% endif %}>Data / AI Tasks</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Level:</label>
+      <select name="level" onchange="this.form.submit()" class="filter-select">
+        <option value="all" {% if level_filter == 'all' %}selected{% endif %}>All Levels</option>
+        <option value="beginner" {% if level_filter == 'beginner' %}selected{% endif %}>Beginner</option>
+        <option value="intermediate" {% if level_filter == 'intermediate' %}selected{% endif %}>Intermediate</option>
+        <option value="advanced" {% if level_filter == 'advanced' %}selected{% endif %}>Advanced</option>
+      </select>
+    </div>
+  </form>
+</div>
+
+{% if courses %}
+  <div class="courses-grid">
+    {% for course in courses %}
+      <div class="course-card">
+        <div class="course-header">
+          <div class="course-category">{{ course.category }}</div>
+          <div class="course-level level-{{ course.level|lower }}">{{ course.level }}</div>
+        </div>
+        <h3>{{ course.title }}</h3>
+        <p class="course-description">{{ course.description }}</p>
+        
+        <div class="course-topics">
+          <strong>Topics covered:</strong>
+          <div class="topics-list">
+            {% for topic in course.topics %}
+              <span class="topic-tag">{{ topic }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="course-footer">
+          <div class="course-meta">
+            <span class="course-duration">⏱️ {{ course.duration }}</span>
+            {% if course.provider %}
+              <span class="course-provider">📚 {{ course.provider }}</span>
+            {% endif %}
+            {% if course.certification %}
+              <span class="course-cert-badge">✓ Certification Available</span>
+            {% endif %}
+          </div>
+          <a href="{{ course.url }}" target="_blank" class="btn-primary">View Course</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <p>No courses found matching your filters. Try adjusting your search criteria.</p>
+  </div>
+{% endif %}
+{% endblock %}
+
+

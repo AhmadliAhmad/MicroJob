@@ -8,12 +8,20 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="logo">
-      <span class="logo-mark">MJ</span>
-      <span class="logo-text">Micro Job</span>
-    </div>
+    <a href="{{ url_for('index') }}" class="logo">
+      <div class="logo-container">
+        <div class="logo-square">
+          <div class="logo-letters">
+            <span class="logo-m">M</span>
+            <span class="logo-j">J</span>
+          </div>
+        </div>
+        <div class="logo-main-text">MICRO JOB</div>
+      </div>
+    </a>
     <nav class="nav-links">
       <a href="{{ url_for('index') }}">Browse Jobs</a>
+      <a href="{{ url_for('courses') }}">Courses</a>
       {% if user %}
         <a href="{{ url_for('dashboard') }}">Dashboard</a>
         <a href="{{ url_for('messages') }}">Messages</a>

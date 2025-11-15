@@ -18,14 +18,36 @@
   </label>
 
   <label>Category
-    <input type="text" name="category" placeholder="Social media, Design, Data entry...">
+    <select name="category" required>
+      <option value="">-- Select a category --</option>
+      <optgroup label="Online Jobs">
+        <option value="IT & Programming">IT & Programming</option>
+        <option value="Graphic & Design">Graphic & Design</option>
+        <option value="Writing & Translation">Writing & Translation</option>
+        <option value="Marketing & SMM">Marketing & SMM</option>
+        <option value="Education & Tutoring">Education & Tutoring</option>
+        <option value="Virtual Assistant">Virtual Assistant</option>
+        <option value="Data / AI Tasks">Data / AI Tasks</option>
+      </optgroup>
+      <optgroup label="Offline Jobs">
+        <option value="Delivery">Delivery</option>
+        <option value="Home & Repair Services">Home & Repair Services</option>
+        <option value="Event & Photography">Event & Photography</option>
+        <option value="Construction & Labor">Construction & Labor</option>
+        <option value="Agriculture">Agriculture</option>
+        <option value="Transportation">Transportation</option>
+      </optgroup>
+    </select>
   </label>
 
   <label>Mode
-    <select name="mode">
+    <select name="mode" id="mode-select">
       <option value="online">Online</option>
       <option value="offline">Offline</option>
     </select>
+    <small style="display: block; margin-top: 4px; color: var(--text-secondary); font-size: 12px;">
+      Mode is automatically set based on the selected category
+    </small>
   </label>
 
   <label>Required skill
@@ -42,4 +64,29 @@
 
   <button type="submit" class="btn-primary">Create task</button>
 </form>
+
+<script>
+  // Auto-update mode based on selected category
+  const categorySelect = document.querySelector('select[name="category"]');
+  const modeSelect = document.getElementById('mode-select');
+  
+  const onlineCategories = [
+    'IT & Programming', 'Graphic & Design', 'Writing & Translation',
+    'Marketing & SMM', 'Education & Tutoring', 'Virtual Assistant', 'Data / AI Tasks'
+  ];
+  
+  const offlineCategories = [
+    'Delivery', 'Home & Repair Services', 'Event & Photography',
+    'Construction & Labor', 'Agriculture', 'Transportation'
+  ];
+  
+  categorySelect.addEventListener('change', function() {
+    const selectedCategory = this.value;
+    if (onlineCategories.includes(selectedCategory)) {
+      modeSelect.value = 'online';
+    } else if (offlineCategories.includes(selectedCategory)) {
+      modeSelect.value = 'offline';
+    }
+  });
+</script>
 {% endblock %}

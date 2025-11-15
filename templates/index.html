@@ -29,9 +29,23 @@
       <label>Category:</label>
       <select name="category" onchange="this.form.submit()" form="filter-form" class="filter-select">
         <option value="all">All Categories</option>
-        {% for cat in categories %}
-          <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat }}</option>
-        {% endfor %}
+        <optgroup label="Online Jobs">
+          <option value="IT & Programming" {% if category == 'IT & Programming' %}selected{% endif %}>IT & Programming</option>
+          <option value="Graphic & Design" {% if category == 'Graphic & Design' %}selected{% endif %}>Graphic & Design</option>
+          <option value="Writing & Translation" {% if category == 'Writing & Translation' %}selected{% endif %}>Writing & Translation</option>
+          <option value="Marketing & SMM" {% if category == 'Marketing & SMM' %}selected{% endif %}>Marketing & SMM</option>
+          <option value="Education & Tutoring" {% if category == 'Education & Tutoring' %}selected{% endif %}>Education & Tutoring</option>
+          <option value="Virtual Assistant" {% if category == 'Virtual Assistant' %}selected{% endif %}>Virtual Assistant</option>
+          <option value="Data / AI Tasks" {% if category == 'Data / AI Tasks' %}selected{% endif %}>Data / AI Tasks</option>
+        </optgroup>
+        <optgroup label="Offline Jobs">
+          <option value="Delivery" {% if category == 'Delivery' %}selected{% endif %}>Delivery</option>
+          <option value="Home & Repair Services" {% if category == 'Home & Repair Services' %}selected{% endif %}>Home & Repair Services</option>
+          <option value="Event & Photography" {% if category == 'Event & Photography' %}selected{% endif %}>Event & Photography</option>
+          <option value="Construction & Labor" {% if category == 'Construction & Labor' %}selected{% endif %}>Construction & Labor</option>
+          <option value="Agriculture" {% if category == 'Agriculture' %}selected{% endif %}>Agriculture</option>
+          <option value="Transportation" {% if category == 'Transportation' %}selected{% endif %}>Transportation</option>
+        </optgroup>
       </select>
     </div>
 
