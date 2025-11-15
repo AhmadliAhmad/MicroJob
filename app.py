@@ -274,7 +274,6 @@ def index():
     tasks = q.order_by(Task.id.desc()).all()
     user = current_user()
     
-    # Fixed list of categories matching the job posting form
     all_categories = [
         'IT & Programming', 'Graphic & Design', 'Writing & Translation',
         'Marketing & SMM', 'Education & Tutoring', 'Virtual Assistant', 'Data / AI Tasks',
@@ -359,7 +358,6 @@ def new_task():
             flash('Please select a category.', 'error')
             return render_template('new_task.html', user=user)
 
-        # Auto-set mode based on category if not explicitly set
         online_categories = [
             'IT & Programming', 'Graphic & Design', 'Writing & Translation',
             'Marketing & SMM', 'Education & Tutoring', 'Virtual Assistant', 'Data / AI Tasks'
@@ -500,7 +498,6 @@ def courses():
     user = current_user()
     
     all_courses = [
-        # IT & Programming
         {
             'id': 1,
             'title': 'Meta Front-End Developer Professional Certificate',
@@ -537,8 +534,6 @@ def courses():
             'certification': True,
             'url': 'https://aws.amazon.com/training/learn-about/cloud-practitioner/'
         },
-        
-        # Graphic & Design
         {
             'id': 4,
             'title': 'Google UX Design Professional Certificate',
@@ -563,8 +558,6 @@ def courses():
             'certification': True,
             'url': 'https://www.adobe.com/education/certification.html'
         },
-        
-        # Writing & Translation
         {
             'id': 6,
             'title': 'LinkedIn Learning: Professional Writing',
@@ -589,8 +582,6 @@ def courses():
             'certification': True,
             'url': 'https://academy.hubspot.com/courses/content-marketing'
         },
-        
-        # Marketing & SMM
         {
             'id': 8,
             'title': 'Meta Social Media Marketing Professional Certificate',
@@ -639,8 +630,6 @@ def courses():
             'certification': True,
             'url': 'https://analytics.google.com/analytics/academy/'
         },
-        
-        # Education & Tutoring
         {
             'id': 12,
             'title': 'Teaching English as a Foreign Language (TEFL)',
@@ -665,8 +654,6 @@ def courses():
             'certification': True,
             'url': 'https://www.coursera.org/learn/online-tutoring'
         },
-        
-        # Virtual Assistant
         {
             'id': 14,
             'title': 'Microsoft Excel Skills for Business Specialization',
@@ -691,8 +678,6 @@ def courses():
             'certification': True,
             'url': 'https://www.udemy.com/courses/search/?q=virtual+assistant'
         },
-        
-        # Data / AI Tasks
         {
             'id': 16,
             'title': 'IBM Data Science Professional Certificate',
@@ -946,15 +931,13 @@ def init_db():
     db.session.add(worker)
     db.session.commit()
 
-    # Online Jobs
     tasks = [
-        # IT & Programming
         Task(
             title='Fix WordPress website bug',
             description='Need to fix a responsive design issue on our WordPress site. The mobile menu is not working properly.',
             budget_azn=50,
             category='IT & Programming',
-        mode='online',
+            mode='online',
             required_skill='WordPress, CSS, HTML, PHP',
             difficulty='intermediate',
             employer_id=employer.id
@@ -966,20 +949,18 @@ def init_db():
             category='IT & Programming',
             mode='online',
             required_skill='HTML, CSS, JavaScript',
-        difficulty='beginner',
-        employer_id=employer.id
+            difficulty='beginner',
+            employer_id=employer.id
         ),
-        
-        # Graphic & Design
         Task(
             title='Design logo for startup company',
             description='Need a professional logo design for our tech startup. Should be modern and memorable.',
             budget_azn=120,
             category='Graphic & Design',
-        mode='online',
+            mode='online',
             required_skill='Logo design, Adobe Illustrator, branding',
-        difficulty='intermediate',
-        employer_id=employer.id
+            difficulty='intermediate',
+            employer_id=employer.id
         ),
         Task(
             title='Create 5 social media graphics',
@@ -991,8 +972,6 @@ def init_db():
             difficulty='beginner',
             employer_id=employer.id
         ),
-        
-        # Writing & Translation
         Task(
             title='Translate website content (EN → AZ)',
             description='Translate our company website from English to Azerbaijani. About 10 pages of content.',
@@ -1013,8 +992,6 @@ def init_db():
             difficulty='intermediate',
             employer_id=employer.id
         ),
-        
-        # Marketing & SMM
         Task(
             title='Manage Instagram account for 1 month',
             description='Need someone to create content, post daily, and engage with followers for our fashion brand.',
@@ -1035,8 +1012,6 @@ def init_db():
             difficulty='intermediate',
             employer_id=employer.id
         ),
-        
-        # Education & Tutoring
         Task(
             title='Online English tutoring for kids',
             description='Need an English tutor for my 8-year-old child. 2 hours per week, online sessions.',
@@ -1057,8 +1032,6 @@ def init_db():
             difficulty='intermediate',
             employer_id=employer.id
         ),
-        
-        # Virtual Assistant
         Task(
             title='Data entry and email management',
             description='Need help organizing customer data in Excel and managing daily emails. 10 hours per week.',
@@ -1079,8 +1052,6 @@ def init_db():
             difficulty='beginner',
             employer_id=employer.id
         ),
-        
-        # Data / AI Tasks
         Task(
             title='Data analysis for sales report',
             description='Analyze our monthly sales data and create visualizations. Need insights and recommendations.',
@@ -1101,20 +1072,16 @@ def init_db():
             difficulty='beginner',
             employer_id=employer.id
         ),
-        
-        # Offline Jobs - Delivery
         Task(
             title='Food delivery in Baku city center',
             description='Need reliable person for food delivery service. Must have own transportation. Flexible hours.',
             budget_azn=200,
             category='Delivery',
-        mode='offline',
+            mode='offline',
             required_skill='Delivery, driving, customer service',
-        difficulty='beginner',
-        employer_id=employer.id
+            difficulty='beginner',
+            employer_id=employer.id
         ),
-        
-        # Home & Repair Services
         Task(
             title='Fix leaking faucet in kitchen',
             description='Kitchen faucet is leaking. Need someone to repair or replace it. Must bring own tools.',
@@ -1135,8 +1102,6 @@ def init_db():
             difficulty='beginner',
             employer_id=employer.id
         ),
-        
-        # Event & Photography
         Task(
             title='Photographer for wedding event',
             description='Need professional photographer for wedding ceremony. 6 hours coverage, 200+ photos.',
@@ -1157,8 +1122,6 @@ def init_db():
             difficulty='beginner',
             employer_id=employer.id
         ),
-        
-        # Construction & Labor
         Task(
             title='Help with furniture assembly',
             description='Need help assembling IKEA furniture. 3 pieces: bed, wardrobe, and desk.',
@@ -1179,8 +1142,6 @@ def init_db():
             difficulty='beginner',
             employer_id=employer.id
         ),
-        
-        # Agriculture
         Task(
             title='Harvest vegetables from garden',
             description='Need help harvesting tomatoes, cucumbers, and peppers. 4 hours work.',
@@ -1191,8 +1152,6 @@ def init_db():
             difficulty='beginner',
             employer_id=employer.id
         ),
-        
-        # Transportation
         Task(
             title='Drive to airport and back',
             description='Need driver to pick up from airport and drop off at hotel. 2 trips, same day.',
