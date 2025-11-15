@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Job – {{ task.title }}{% endblock %}
+
+{% block content %}
+<div class="task-detail-wrapper">
+  <div class="task-detail-main">
+    <div class="task-detail-card">
+      <div class="task-detail-header">
+        <h1>{{ task.title }}</h1>
+        <div class="task-budget-large">{{ task.budget_azn }} AZN</div>
+      </div>
+
+      <div class="task-detail-meta">
+        <span class="meta-badge"><strong>Category:</strong> {{ task.category or 'General' }}</span>
+        <span class="meta-badge"><strong>Mode:</strong> {{ task.mode|title }}</span>
+        <span class="meta-badge"><strong>Difficulty:</strong> {{ task.difficulty|title }}</span>
+        <span class="meta-badge status-{{ task.status }}"><strong>Status:</strong> {{ task.status|title }}</span>
+      </div>
+
+      <div class="task-description">
+        <h2>Description</h2>
+        <p>{{ task.description|nl2br }}</p>
+      </div>
+
+      {% if task.required_skill %}
+      <div class="task-skills">
+        <h3>Required Skills</h3>
+        <p>{{ task.required_skill }}</p>
+      </div>
+      {% endif %}
+
+      <div class="task-detail-actions">
+        {% if user and user.role == 'employer' and task.employer_id == user.id %}
+          {% if task.status == 'assigned' %}
+            <form method="post" action="{{ url_for('complete_task', task_id=task.id) }}" style="display:inline;">
+              <button type="submit" class="btn-primary">Mark as Completed</button>
+            </form>
+          {% endif %}
+          {% if task.status == 'completed' %}
+            {% set existing_review = task.reviews|selectattr('reviewer_id', 'equalto', user.id)|list %}
+            {% if not existing_review %}
+              <a href="{{ url_for('add_review', task_id=task.id) }}" class="btn-primary">Leave Review</a>
+            {% endif %}
+          {% endif %}
+        {% elif user and user.role == 'worker' %}
+          <a href="{{ url_for('learn', task_id=task.id) }}" class="btn-ai-learn">
+            <span class="ai-icon">🤖</span> Learn with AI
+          </a>
+          {% if task.status == 'open' %}
+            {% if not user_bid %}
+              <button onclick="document.getElementById('bid-form').style.display='block'" class="btn-primary">Place Bid</button>
+            {% else %}
+              <div class="info-box">You have already placed a bid: <strong>{{ user_bid.amount }} AZN</strong></div>
+            {% endif %}
+          {% endif %}
+        {% elif not user %}
+          <a href="{{ url_for('learn', task_id=task.id) }}" class="btn-ai-learn">
+            <span class="ai-icon">🤖</span> Learn with AI
+          </a>
+          <a href="{{ url_for('login') }}" class="btn-primary">Login to Place Bid</a>
+        {% endif %}
+      </div>
+
+      <!-- Bid Form -->
+      {% if user and user.role == 'worker' and task.status == 'open' and not user_bid %}
+      <div id="bid-form" class="bid-form" style="display:none;">
+        <h3>Place Your Bid</h3>
+        <form method="post" action="{{ url_for('place_bid', task_id=task.id) }}">
+          <label>
+            Your Bid Amount (AZN)
+            <input type="number" name="amount" step="0.1" min="0.1" required value="{{ task.budget_azn }}">
+          </label>
+          <label>
+            Proposal (Optional)
+            <textarea name="proposal" rows="4" placeholder="Tell the employer why you're the right person for this job..."></textarea>
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Submit Bid</button>
+            <button type="button" onclick="document.getElementById('bid-form').style.display='none'" class="btn-secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Bids Section -->
+    {% if user and user.role == 'employer' and task.employer_id == user.id and bids %}
+    <div class="bids-section">
+      <h2>Bids ({{ bids|length }})</h2>
+      <div class="bids-list">
+        {% for bid in bids %}
+          <div class="bid-card {% if bid.status == 'accepted' %}bid-accepted{% endif %}">
+            <div class="bid-header">
+              <a href="{{ url_for('profile', user_id=bid.worker_id) }}" class="bid-worker">
+                <strong>{{ bid.worker.name }}</strong>
+                {% if bid.worker.average_rating() > 0 %}
+                  <span class="rating">⭐ {{ "%.1f"|format(bid.worker.average_rating()) }} ({{ bid.worker.total_reviews() }})</span>
+                {% endif %}
+              </a>
+              <div class="bid-amount">{{ bid.amount }} AZN</div>
+            </div>
+            {% if bid.proposal %}
+              <p class="bid-proposal">{{ bid.proposal }}</p>
+            {% endif %}
+            <div class="bid-footer">
+              <span class="bid-time">{{ bid.created_at.strftime('%B %d, %Y') }}</span>
+              {% if task.status == 'open' and bid.status == 'pending' %}
+                <form method="post" action="{{ url_for('accept_bid', task_id=task.id, bid_id=bid.id) }}" style="display:inline;">
+                  <button type="submit" class="btn-primary btn-sm">Accept Bid</button>
+                </form>
+              {% elif bid.status == 'accepted' %}
+                <span class="badge-success">Accepted</span>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Sidebar -->
+  <div class="task-sidebar">
+    <div class="sidebar-card">
+      <h3>Job Details</h3>
+      <div class="sidebar-info">
+        <div class="info-item">
+          <strong>Posted by:</strong>
+          <a href="{{ url_for('profile', user_id=task.employer_id) }}">{{ task.employer.name }}</a>
+        </div>
+        {% if task.worker %}
+        <div class="info-item">
+          <strong>Assigned to:</strong>
+          <a href="{{ url_for('profile', user_id=task.worker_id) }}">{{ task.worker.name }}</a>
+        </div>
+        {% endif %}
+        <div class="info-item">
+          <strong>Posted:</strong>
+          {{ task.created_at.strftime('%B %d, %Y') if task.created_at else 'Recently' }}
+        </div>
+      </div>
+    </div>
+
+    {% if user and user.id != task.employer_id %}
+    <div class="sidebar-card">
+      <a href="{{ url_for('conversation', partner_id=task.employer_id) }}?task_id={{ task.id }}" class="btn-primary btn-block">Message Employer</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Post new task{% endblock %}
+
+{% block content %}
+<h1>Post a new micro-job</h1>
+
+<form method="post" class="form-card">
+  <label>Title
+    <input type="text" name="title" required>
+  </label>
+
+  <label>Description
+    <textarea name="description" rows="4" required></textarea>
+  </label>
+
+  <label>Budget (AZN)
+    <input type="number" name="budget" step="0.1" required>
+  </label>
+
+  <label>Category
+    <input type="text" name="category" placeholder="Social media, Design, Data entry...">
+  </label>
+
+  <label>Mode
+    <select name="mode">
+      <option value="online">Online</option>
+      <option value="offline">Offline</option>
+    </select>
+  </label>
+
+  <label>Required skill
+    <input type="text" name="required_skill" placeholder="e.g. social media, canva">
+  </label>
+
+  <label>Difficulty
+    <select name="difficulty">
+      <option value="beginner">Beginner</option>
+      <option value="intermediate">Intermediate</option>
+      <option value="advanced">Advanced</option>
+    </select>
+  </label>
+
+  <button type="submit" class="btn-primary">Create task</button>
+</form>
+{% endblock %}

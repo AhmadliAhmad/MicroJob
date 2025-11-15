@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}AI Learning Path – {{ task.title }}{% endblock %}
+
+{% block content %}
+<div class="learn-wrapper">
+  <div class="learn-header">
+    <div class="ai-badge">
+      <span class="ai-icon-large">🤖</span>
+      <span>AI-Powered Learning</span>
+    </div>
+    <h1>Personalized Learning Path</h1>
+    <p class="learn-subtitle">Based on your job requirements, we've created a custom learning path to help you succeed</p>
+  </div>
+
+  <div class="learn-card">
+    <div class="task-info-section">
+      <h2>📋 Job Details</h2>
+      <div class="task-info-card">
+        <h3>{{ task.title }}</h3>
+        <p>{{ task.description }}</p>
+        <div class="task-info-meta">
+          <span><strong>Category:</strong> {{ task.category or 'General' }}</span>
+          <span><strong>Difficulty:</strong> {{ task.difficulty|title }}</span>
+          <span><strong>Budget:</strong> {{ task.budget_azn }} AZN</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="learning-path-section">
+      <h2>🎓 Your Learning Path</h2>
+      <div class="path-header">
+        <h3>{{ learning_path.title }}</h3>
+        <div class="time-badge">
+          <span>⏱️</span>
+          <span>{{ learning_path.estimated_time }}</span>
+        </div>
+      </div>
+      <p class="path-description">{{ learning_path.description }}</p>
+
+      <div class="resources-section">
+        <h3>📚 Learning Resources</h3>
+        <div class="resources-list">
+          {% for resource in learning_path.resources %}
+            <div class="resource-card">
+              <div class="resource-header">
+                <span class="resource-type">{{ resource.type }}</span>
+                <span class="resource-duration">{{ resource.duration }}</span>
+              </div>
+              <h4>{{ resource.title }}</h4>
+              <a href="{{ resource.url }}" target="_blank" class="resource-link">
+                <span>Start Learning →</span>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="tips-section">
+        <h3>💡 Pro Tips</h3>
+        <ul class="tips-list">
+          {% for tip in learning_path.tips %}
+            <li>{{ tip }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div class="action-section">
+      {% if user and user.role == 'worker' %}
+        {% if task.status == 'open' %}
+          <a href="{{ url_for('task_detail', task_id=task.id) }}" class="btn-primary">Ready to Bid? Go to Job</a>
+        {% else %}
+          <a href="{{ url_for('task_detail', task_id=task.id) }}" class="btn-primary">View Job Details</a>
+        {% endif %}
+      {% else %}
+        <a href="{{ url_for('task_detail', task_id=task.id) }}" class="btn-primary">View Job Details</a>
+        {% if not user %}
+          <a href="{{ url_for('register') }}" class="btn-secondary">Sign Up to Start Earning</a>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="ai-note">
+    <p><strong>Note:</strong> This learning path is generated using AI analysis of the job requirements. Complete the resources above to build the skills needed for this job!</p>
+  </div>
+</div>
+{% endblock %}

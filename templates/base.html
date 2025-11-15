@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Micro Job{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo">
+      <span class="logo-mark">MJ</span>
+      <span class="logo-text">Micro Job</span>
+    </div>
+    <nav class="nav-links">
+      <a href="{{ url_for('index') }}">Browse Jobs</a>
+      {% if user %}
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('messages') }}">Messages</a>
+        {% if user.role == 'employer' %}
+          <a href="{{ url_for('new_task') }}">Post Job</a>
+        {% endif %}
+        <a href="{{ url_for('profile', user_id=user.id) }}">{{ user.name }}</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+      {% else %}
+        <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('register') }}">Sign Up</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <span>Micro Job – Learn &amp; Earn • Hackathon demo</span>
+  </footer>
+</body>
+</html>

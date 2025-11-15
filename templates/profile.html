@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}{{ profile_user.name }} – Profile{% endblock %}
+
+{% block content %}
+<div class="profile-header">
+  <div class="profile-avatar">
+    <div class="avatar-circle">{{ profile_user.name[0].upper() }}</div>
+  </div>
+  <div class="profile-info">
+    <h1>{{ profile_user.name }}</h1>
+    <p class="profile-role">{{ profile_user.role|title }}</p>
+    {% if profile_user.location %}
+      <p class="profile-location">📍 {{ profile_user.location }}</p>
+    {% endif %}
+    {% if profile_user.role == 'worker' %}
+      <div class="profile-rating">
+        <span class="rating-stars">⭐</span>
+        <strong>{{ "%.1f"|format(profile_user.average_rating()) }}</strong>
+        <span class="rating-count">({{ profile_user.total_reviews() }} reviews)</span>
+      </div>
+    {% endif %}
+    {% if user and user.id == profile_user.id %}
+      <a href="{{ url_for('edit_profile') }}" class="btn-secondary">Edit Profile</a>
+    {% endif %}
+  </div>
+</div>
+
+{% if profile_user.bio %}
+<div class="profile-section">
+  <h2>About</h2>
+  <p>{{ profile_user.bio }}</p>
+</div>
+{% endif %}
+
+{% if profile_user.skills %}
+<div class="profile-section">
+  <h2>Skills</h2>
+  <div class="skills-list">
+    {% for skill in profile_user.skills.split(',') %}
+      <span class="skill-tag">{{ skill.strip() }}</span>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if reviews %}
+<div class="profile-section">
+  <h2>Reviews ({{ reviews|length }})</h2>
+  <div class="reviews-list">
+    {% for review in reviews %}
+      <div class="review-card">
+        <div class="review-header">
+          <a href="{{ url_for('profile', user_id=review.reviewer_id) }}">
+            <strong>{{ review.reviewer.name }}</strong>
+          </a>
+          <div class="review-rating">
+            {% for i in range(review.rating) %}⭐{% endfor %}
+          </div>
+        </div>
+        {% if review.comment %}
+          <p class="review-comment">{{ review.comment }}</p>
+        {% endif %}
+        <div class="review-meta">
+          <span>{{ review.created_at.strftime('%B %d, %Y') if review.created_at else 'Recently' }}</span>
+          {% if review.task %}
+            <a href="{{ url_for('task_detail', task_id=review.task_id) }}" class="link">View Job</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if tasks %}
+<div class="profile-section">
+  <h2>{{ 'Posted Jobs' if profile_user.role == 'employer' else 'Completed Jobs' }} ({{ tasks|length }})</h2>
+  <div class="tasks-list">
+    {% for t in tasks %}
+      <a href="{{ url_for('task_detail', task_id=t.id) }}" class="task-card-small">
+        <h3>{{ t.title }}</h3>
+        <div class="task-meta-small">
+          <span>{{ t.budget_azn }} AZN</span>
+          <span class="status-{{ t.status }}">{{ t.status|title }}</span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+

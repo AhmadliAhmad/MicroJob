@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Micro Job – Browse Jobs{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Find Your Perfect Job</h1>
+  <p class="subtitle">Browse available freelance opportunities</p>
+</div>
+
+<!-- Search and Filters -->
+<div class="search-filters">
+  <form method="GET" action="{{ url_for('index') }}" class="search-form">
+    <input type="text" name="search" placeholder="Search jobs..." value="{{ search }}" class="search-input">
+    <button type="submit" class="btn-primary">Search</button>
+  </form>
+
+  <div class="filters-row">
+    <div class="filter-group">
+      <label>Mode:</label>
+      <a href="{{ url_for('index', search=search, mode='all', category=category, difficulty=difficulty) }}" 
+         class="chip {% if filter_mode=='all' %}chip-active{% endif %}">All</a>
+      <a href="{{ url_for('index', search=search, mode='online', category=category, difficulty=difficulty) }}" 
+         class="chip {% if filter_mode=='online' %}chip-active{% endif %}">Online</a>
+      <a href="{{ url_for('index', search=search, mode='offline', category=category, difficulty=difficulty) }}" 
+         class="chip {% if filter_mode=='offline' %}chip-active{% endif %}">Offline</a>
+    </div>
+
+    <div class="filter-group">
+      <label>Category:</label>
+      <select name="category" onchange="this.form.submit()" form="filter-form" class="filter-select">
+        <option value="all">All Categories</option>
+        {% for cat in categories %}
+          <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Difficulty:</label>
+      <select name="difficulty" onchange="this.form.submit()" form="filter-form" class="filter-select">
+        <option value="all">All Levels</option>
+        <option value="beginner" {% if difficulty == 'beginner' %}selected{% endif %}>Beginner</option>
+        <option value="intermediate" {% if difficulty == 'intermediate' %}selected{% endif %}>Intermediate</option>
+        <option value="advanced" {% if difficulty == 'advanced' %}selected{% endif %}>Advanced</option>
+      </select>
+    </div>
+  </div>
+
+  <form id="filter-form" method="GET" action="{{ url_for('index') }}" style="display:none;">
+    <input type="hidden" name="search" value="{{ search }}">
+    <input type="hidden" name="mode" value="{{ filter_mode }}">
+  </form>
+</div>
+
+{% if not tasks %}
+  <div class="empty-state">
+    <p>No jobs found. {% if user and user.role=='employer' %}<a href="{{ url_for('new_task') }}" class="link">Post one?</a>{% endif %}</p>
+  </div>
+{% else %}
+  <div class="task-grid">
+    {% for t in tasks %}
+      <a href="{{ url_for('task_detail', task_id=t.id) }}" class="task-card">
+        <div class="task-header">
+          <h3>{{ t.title }}</h3>
+          <div class="task-budget">{{ t.budget_azn }} AZN</div>
+        </div>
+        <p class="task-desc">{{ t.description[:150] }}{% if t.description|length > 150 %}...{% endif %}</p>
+        <div class="task-meta">
+          {% if t.category %}
+            <span class="meta-tag">{{ t.category }}</span>
+          {% endif %}
+          <span class="meta-tag">{{ t.mode|title }}</span>
+          <span class="meta-tag">{{ t.difficulty|title }}</span>
+        </div>
+        <div class="task-footer">
+          <span class="task-bids">
+            {% if t.bids %}
+              {{ t.bids|length }} bid{{ 's' if t.bids|length != 1 else '' }}
+            {% else %}
+              No bids yet
+            {% endif %}
+          </span>
+          <span class="task-status status-{{ t.status }}">{{ t.status|title }}</span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+{% endif %}
+{% endblock %}

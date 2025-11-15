@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<h1>Messages</h1>
+
+{% if conversations %}
+  <div class="messages-list">
+    {% for conv in conversations %}
+      <a href="{{ url_for('conversation', partner_id=conv.partner.id) }}" class="conversation-item">
+        <div class="conversation-avatar">
+          {{ conv.partner.name[0].upper() }}
+        </div>
+        <div class="conversation-info">
+          <div class="conversation-header">
+            <strong>{{ conv.partner.name }}</strong>
+            {% if conv.unread_count > 0 %}
+              <span class="unread-badge">{{ conv.unread_count }}</span>
+            {% endif %}
+          </div>
+          {% if conv.last_message %}
+            <p class="conversation-preview">
+              {{ conv.last_message.content[:50] }}{% if conv.last_message.content|length > 50 %}...{% endif %}
+            </p>
+            <span class="conversation-time">
+              {{ conv.last_message.created_at.strftime('%b %d') if conv.last_message.created_at else 'Recently' }}
+            </span>
+          {% endif %}
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <p>No messages yet. Start a conversation from a job page!</p>
+  </div>
+{% endif %}
+{% endblock %}
+

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1>My Dashboard</h1>
+
+<div class="dashboard-stats">
+  <div class="stat-card">
+    <div class="stat-number">{{ bids|length }}</div>
+    <div class="stat-label">Total Bids</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">{{ assigned_tasks|length }}</div>
+    <div class="stat-label">Active Jobs</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">{{ completed_tasks|length }}</div>
+    <div class="stat-label">Completed</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">{{ bids|selectattr('status', 'equalto', 'accepted')|list|length }}</div>
+    <div class="stat-label">Accepted Bids</div>
+  </div>
+</div>
+
+{% if assigned_tasks %}
+<div class="dashboard-section">
+  <h2>Active Jobs</h2>
+  <div class="task-list">
+    {% for task in assigned_tasks %}
+      <div class="task-card">
+        <div class="task-main">
+          <h3><a href="{{ url_for('task_detail', task_id=task.id) }}">{{ task.title }}</a></h3>
+          <p class="task-desc">{{ task.description[:100] }}{% if task.description|length > 100 %}...{% endif %}</p>
+          <div class="task-meta">
+            <span>{{ task.budget_azn }} AZN</span>
+            <span>{{ task.category or 'General' }}</span>
+          </div>
+        </div>
+        <div class="task-side">
+          <a href="{{ url_for('conversation', partner_id=task.employer_id) }}?task_id={{ task.id }}" class="btn-secondary">Message Client</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if bids %}
+<div class="dashboard-section">
+  <h2>My Bids</h2>
+  <div class="bids-list">
+    {% for bid in bids %}
+      <div class="bid-card {% if bid.status == 'accepted' %}bid-accepted{% endif %}">
+        <div class="bid-header">
+          <a href="{{ url_for('task_detail', task_id=bid.task_id) }}">
+            <strong>{{ bid.task.title }}</strong>
+          </a>
+          <div class="bid-amount">{{ bid.amount }} AZN</div>
+        </div>
+        <div class="bid-footer">
+          <span class="bid-status status-{{ bid.status }}">{{ bid.status|title }}</span>
+          <span class="bid-time">{{ bid.created_at.strftime('%B %d, %Y') if bid.created_at else 'Recently' }}</span>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if completed_tasks %}
+<div class="dashboard-section">
+  <h2>Completed Jobs</h2>
+  <div class="task-list">
+    {% for task in completed_tasks %}
+      <div class="task-card">
+        <div class="task-main">
+          <h3><a href="{{ url_for('task_detail', task_id=task.id) }}">{{ task.title }}</a></h3>
+          <p class="task-desc">{{ task.description[:100] }}{% if task.description|length > 100 %}...{% endif %}</p>
+        </div>
+        <div class="task-side">
+          <div class="task-budget">{{ task.budget_azn }} AZN</div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+

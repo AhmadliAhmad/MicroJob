@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<h1>Create account</h1>
+<form method="post" class="form-card" id="register-form">
+  <label>Name
+    <input type="text" name="name" required>
+  </label>
+  <label>Email
+    <input type="email" name="email" required>
+  </label>
+  <label>Password
+    <input type="password" name="password" required>
+  </label>
+  
+  <label class="role-label">I want to:
+    <div class="role-buttons">
+      <input type="radio" name="role" value="worker" id="role-worker" checked required>
+      <label for="role-worker" class="role-button">
+        <span class="role-title">Work</span>
+        <span class="role-desc">Complete tasks and earn income</span>
+      </label>
+      
+      <input type="radio" name="role" value="employer" id="role-employer" required>
+      <label for="role-employer" class="role-button">
+        <span class="role-title">Hire</span>
+        <span class="role-desc">Post projects and find professionals</span>
+      </label>
+    </div>
+  </label>
+  
+  <label>Skills (for workers, optional)
+    <input type="text" name="skills" placeholder="social media, design, translation" id="skills-input">
+  </label>
+  
+  <button type="submit" class="btn-primary">Create Account</button>
+</form>
+
+<script>
+  // Show/hide skills input based on role selection
+  document.querySelectorAll('input[name="role"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      const skillsInput = document.getElementById('skills-input');
+      const skillsLabel = skillsInput.closest('label');
+      if (this.value === 'worker') {
+        skillsLabel.style.display = 'block';
+      } else {
+        skillsLabel.style.display = 'none';
+      }
+    });
+  });
+  
+  // Trigger on page load
+  document.querySelector('input[name="role"]:checked').dispatchEvent(new Event('change'));
+</script>
+{% endblock %}

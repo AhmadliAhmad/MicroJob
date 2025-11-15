@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Leave Review{% endblock %}
+
+{% block content %}
+<h1>Leave a Review</h1>
+
+<div class="review-info">
+  <p>You are reviewing <strong>{{ reviewee.name }}</strong> for the job: <a href="{{ url_for('task_detail', task_id=task.id) }}">{{ task.title }}</a></p>
+</div>
+
+<form method="post" class="form-card">
+  <label>
+    Rating (1-5 stars)
+    <select name="rating" required>
+      <option value="5">5 ⭐⭐⭐⭐⭐ Excellent</option>
+      <option value="4">4 ⭐⭐⭐⭐ Very Good</option>
+      <option value="3">3 ⭐⭐⭐ Good</option>
+      <option value="2">2 ⭐⭐ Fair</option>
+      <option value="1">1 ⭐ Poor</option>
+    </select>
+  </label>
+
+  <label>
+    Comment (Optional)
+    <textarea name="comment" rows="5" placeholder="Share your experience..."></textarea>
+  </label>
+
+  <div class="form-actions">
+    <button type="submit" class="btn-primary">Submit Review</button>
+    <a href="{{ url_for('task_detail', task_id=task.id) }}" class="btn-secondary">Cancel</a>
+  </div>
+</form>
+{% endblock %}
+
