@@ -173,19 +173,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 👥 Authors
-
-- Your Name - *Initial work*
-
 ## 🙏 Acknowledgments
 
 - Flask community for excellent documentation
 - Fiverr for design inspiration
 - All contributors and users
-
-## 📞 Support
-
-For support, email your-email@example.com or open an issue in the repository.
 
 ---
 
